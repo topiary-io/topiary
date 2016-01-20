@@ -10,33 +10,33 @@ Topiary is currently alpha software. It will build your Hugo source, start a web
 
 Right now the only way to install is by building from source.
 
-0. Make sure to have [Git](https://git-scm.com/downloads), [Go](https://golang.org/dl/), and [Hugo](http://gohugo.io/overview/installing/) installed.
+1. Make sure to have [Git](https://git-scm.com/downloads), [Go](https://golang.org/dl/), and [Hugo](http://gohugo.io/overview/installing/) installed.
 
-1. Clone the Topiary repo:
-```
-go get github.com/topiary-io/topiary
-```
+2. Clone the Topiary repo:
+  ```
+  go get github.com/topiary-io/topiary
+  ```
 
-2. Build Topiary:
-```
-cd topiary
-go install
-```
+3. Build Topiary:
+  ```
+  cd topiary
+  go install
+  ```
 
-2.5. If you don't have a Hugo site, clone [a bootstrapped site](https://github.com/enten/hyde-y):
-```
-cd $HOME/project-dir
-git clone https://github.com/enten/hyde-y
-```
+4. If you don't have a Hugo site, clone [a bootstrapped site](https://github.com/enten/hyde-y):
+  ```
+  cd $HOME/project-dir
+  git clone https://github.com/enten/hyde-y
+  ```
 
-3. Start Topiary:
-```
-cd path/to/site/root
-topiary
-```
+5. Start Topiary:
+  ```
+  cd path/to/site/root
+  topiary
+  ```
 
-4. Point a web browser to localhost:3000 to view your site, and localhost:3000/admin to view the site input.
+6. Point a web browser to localhost:3000 to view your site, and localhost:3000/admin to view the site input.
 
 ### License
-Apache 2.0
 
+Apache 2.0
