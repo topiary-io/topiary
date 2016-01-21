@@ -12,7 +12,7 @@ Topiary is currently alpha software. It will build your Hugo source, start a web
 2. Run Topiary on a local server or intranet, for team use. Manually copy or automatically sync the output to your production environment, either as changes are made or at regular intervals.
 3. Run Topiary in your production environment, for individual or team use. Have your site rebuild as you make changes.
 
-Possible production environments are GitHub Pages, a VPS, a shared host, [IPFS](ipfs.io), or your own server. Since the output is static, it's lightweight, secure, cheap to host, and simple to set up.
+Possible production environments are GitHub Pages, a VPS, a shared host, [IPFS](https://ipfs.io), or your own server. Since the output is static, it's lightweight, secure, cheap to host, and simple to set up.
 
 ### Installation
 
