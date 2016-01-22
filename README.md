@@ -1,6 +1,6 @@
 # Topiary
 
-A content management system built on [Hugo](github.com/spf13/hugo), a static website generator.
+A content management system built on [Hugo](https://github.com/spf13/hugo), a static website generator.
 
 ### Status
 
@@ -22,25 +22,25 @@ Right now the only way to install is by building from source.
 
 2. Clone the Topiary repo:
   ```
-  go get github.com/topiary-io/topiary
+  $ go get github.com/topiary-io/topiary
   ```
 
 3. Build Topiary:
   ```
-  cd topiary
-  go install
+  $ cd topiary
+  $ go install
   ```
 
 4. If you don't have a Hugo site, clone [a bootstrapped site](https://github.com/enten/hugo-boilerplate):
   ```
-  cd path/to/project/dir
-  git clone https://github.com/enten/hugo-boilerplate
+  $ cd path/to/project/dir
+  $ git clone https://github.com/enten/hugo-boilerplate
   ```
 
 5. Start Topiary:
   ```
-  cd path/to/hugo/site/root
-  topiary
+  $ cd path/to/hugo/site/root
+  $ topiary
   ```
 
 6. Point a web browser to `localhost:3000` to view your site, and `localhost:3000/admin` to view the site input.
