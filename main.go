@@ -37,6 +37,9 @@ func loadPage(title string) (*Page, error) {
 
 func adminHandler(w http.ResponseWriter, r *http.Request) {
 	title := r.URL.Path[len("/admin/"):]
+	if title == "" {
+		title = "./"
+	}
 	paths, _ := ioutil.ReadDir(title)
 	for _, p := range paths {
 		if p.IsDir() {
@@ -55,7 +58,7 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Fprintf(w, "<h1>Editing %s</h1>"+
 		"<form action=\"/save/%s\" method=\"POST\">"+
-		"<textarea name=\"body\">%s</textarea><br>"+
+		"<textarea name=\"body\" style=\"width:800px;height:400px;\">%s</textarea><br>"+
 		"<input type=\"submit\" value=\"Save\">"+
 		"</form>",
 		p.Title, p.Title, p.Body)
