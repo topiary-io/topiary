@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os/exec"
 	// "html/template"
-	// github.com/spf13/viper for reading config and content front matter
 )
 
 func buildSite() {
@@ -36,7 +35,7 @@ func loadPage(title string) (*Page, error) {
 }
 
 func adminHandler(w http.ResponseWriter, r *http.Request) {
-	title := r.URL.Path[len("/admin/"):]
+	title := r.URL.Path[len(getConfig("AdminLocation")):]
 	if title == "" {
 		title = "./"
 	}
@@ -69,18 +68,22 @@ func saveHandler(w http.ResponseWriter, r *http.Request) {
 	body := r.FormValue("body")
 	p := &Page{Title: title, Body: []byte(body)}
 	p.save()
-	http.Redirect(w, r, "/admin/", http.StatusFound)
+	http.Redirect(w, r, getConfig("AdminLocation"), http.StatusFound)
 }
 
 func main() {
+	initConfig()
 	buildSite()
 
+	adminLocation := getConfig("AdminLocation")
+
 	http.Handle("/", http.FileServer(http.Dir("./public"))) // serve site output (`/public`) into `/`
-	http.HandleFunc("/admin/", adminHandler)
+	http.HandleFunc(adminLocation, adminHandler)
 	http.HandleFunc("/edit/", editHandler)
 	http.HandleFunc("/save/", saveHandler)
 
 	fmt.Println("Starting server on port 3000...")
+	fmt.Println("Admin available at:", adminLocation)
 	err := http.ListenAndServe(":3000", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
