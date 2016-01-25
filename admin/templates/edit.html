@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang=en>
+  <head>
+    <title>Editing {{.Title}} | Topiary</title>
+    <link href="/admin/assets/main.css" rel="stylesheet">
+  </head>
+  <body>
+    <header>
+    </header>
+    <nav>
+    </nav>
+    <main>
+      <h1>Editing {{.Title}}</h1>
+
+      <form action="/admin/save/{{.Title}}" method="POST">
+        <div><textarea name="body" style="width:800px;height:400px;">{{printf "%s" .Body}}</textarea></div>
+        <div><input type="submit" value="Save"></div>
+      </form>
+      <h3><a href="/admin/">home</a></h3>
+    </main>
+    <footer>
+    </footer>
+  </body>
+</html>
+
