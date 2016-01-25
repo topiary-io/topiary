@@ -45,6 +45,19 @@ Right now the only way to install is by building from source.
 
 6. Point a web browser to `localhost:3000` to view your site, and `localhost:3000/admin` to view the site input.
 
+### Config
+
+Topiary will read a config file in either `/etc/topiary` or the location it is ran from.
+Supported types include json, yaml, and toml.
+
+For example, to change the admin url you could have in _topiary.json_:
+
+```
+{
+  "AdminLocation" : "/my-custom-admin-directory/"
+}
+```
+
 ### License
 
 Apache 2.0
