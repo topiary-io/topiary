@@ -1,0 +1,48 @@
+{{ define "header" }}
+
+<!doctype html>
+<html lang=en>
+  <head>
+    <title>Topiary</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
+    <link rel="stylesheet" href="/admin/assets/main.css">
+  </head>
+  <body>
+    <header>
+      <h1><a href="/admin/">topiary</a></h1>
+      <div class="pure-menu pure-menu-horizontal">
+        <ul class="pure-menu-list">
+          <li class="pure-menu-item"><form action="/admin/search/"><input type="text" placeholder="Search..." /></form></li>
+          <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+            <a class="pure-menu-link" href="#">+ New</a>
+            <ul class="pure-menu-children">
+              <li class="pure-menu-item"><a class="pure-menu-link" href="/admin/content/post/">+ Post</a></li>
+              <li class="pure-menu-item"><a class="pure-menu-link" href="/admin/content/post/">+ Page</a></li>
+              <li class="pure-menu-item"><a class="pure-menu-link" href="/admin/content/post/">+ Media</a></li>
+              <li class="pure-menu-item"><a class="pure-menu-link" href="/admin/content/post/">+ Layout</a></li>
+            </ul>
+          </li>
+          <li class="pure-menu-item">Hello $Username!</li>
+        </ul>
+      </div>
+    </header>
+    <nav class="custom-restricted-width">
+      <div class="pure-menu">
+        <ul class="pure-menu-list">
+          <li class="pure-menu-heading">Content</li>
+          <li class="pure-menu-item"><a class="pure-menu-link" href="/admin/content/post/">Posts</a></li>
+          <li class="pure-menu-item"><a class="pure-menu-link" href="/admin/content/page/">Pages</a></li>
+          <li class="pure-menu-item"><a class="pure-menu-link" href="/admin/static/media/">Media</a></li>
+          <li class="pure-menu-heading">Theme</li>
+          <li class="pure-menu-item"><a class="pure-menu-link" href="/admin/layouts/">Layouts</a></li>
+          <li class="pure-menu-item"><a class="pure-menu-link" href="/admin/static/">Assets</a></li>
+          <li class="pure-menu-item"><a class="pure-menu-link" href="/admin/data/">Data</a></li>
+          <li class="pure-menu-heading">Settings</li>
+          <li class="pure-menu-item"><a class="pure-menu-link" href="/admin/edit/config.toml">Configuration</a></li>
+          <li class="pure-menu-item"><a class="pure-menu-link" href="/admin/archetypes/">Archetypes</a></li>
+          <li class="pure-menu-item"><a class="pure-menu-link" href="/admin/users/">Users</a></li>
+      </div>
+    </nav>
+
+{{ end }}

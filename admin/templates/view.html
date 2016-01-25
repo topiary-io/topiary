@@ -1,16 +1,7 @@
 {{ $path := .Title }}
 
-<!doctype html>
-<html lang=en>
-  <head>
-    <title>Topiary</title>
-    <link href="/admin/assets/main.css" rel="stylesheet">
-  </head>
-  <body>
-    <header>
-    </header>
-    <nav>
-    </nav>
+{{ template "header" }}
+
     <main>
       {{range .Body}}
         {{if .IsDir}}
@@ -19,12 +10,7 @@
           <div>edit: <a href="/admin/edit/{{$path}}{{.Name}}">{{.Name}}</a></div>
         {{end}}
       {{end}}
-
-      <h3><a href="/admin/">home</a></h3>
-
     </main>
-    <footer>
-    </footer>
-  </body>
-</html>
+
+{{ template "footer" }}
 
