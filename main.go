@@ -10,9 +10,13 @@ import (
 )
 
 func buildSite() {
-	fmt.Println("Compiling website...")
-	exec.Command("hugo")
-	fmt.Println("Website compiled.")
+	fmt.Println("\n---buildSite---\nCompiling website...")
+
+	out, err := exec.Command("hugo").Output()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("%s\nWebsite complied!\n---buildSite---\n\n", out)
 }
 
 type Page struct {
@@ -23,6 +27,26 @@ type Page struct {
 func (p *Page) save() error {
 	filename := p.Title
 	return ioutil.WriteFile(filename, p.Body, 0600)
+}
+
+func git(file string) {
+	//need to accommodate for username, email eventually
+	cmdName := "git"
+	gitAdd := []string {"add", file}
+	outadd, err := exec.Command(cmdName, gitAdd...).Output()
+	if err != nil {
+		fmt.Printf("fatal error on git add\n")
+		fmt.Println(err)
+	}
+	fmt.Printf("\n------git------\ngit add "+file+" %s\n", outadd)
+
+	gitCommit := []string {"commit", "-m", "updating "+file+" from topiary"}
+	outci, err := exec.Command(cmdName, gitCommit...).Output()
+	if err !=nil {
+		fmt.Printf("fatal error on git commit\n")
+		fmt.Println(err)
+	}
+	fmt.Printf("git commit "+file+" %s\n------git------\n", outci)
 }
 
 func loadPage(title string) (*Page, error) {
@@ -51,6 +75,7 @@ func adminHandler(w http.ResponseWriter, r *http.Request) {
 
 func editHandler(w http.ResponseWriter, r *http.Request) {
 	title := r.URL.Path[len("/edit/"):]
+	adminLocation := getConfig("AdminLocation")
 	p, err := loadPage(title)
 	if err != nil {
 		p = &Page{Title: title}
@@ -59,7 +84,8 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
 		"<form action=\"/save/%s\" method=\"POST\">"+
 		"<textarea name=\"body\" style=\"width:800px;height:400px;\">%s</textarea><br>"+
 		"<input type=\"submit\" value=\"Save\">"+
-		"</form>",
+		"</form>"+
+		"<a href=\""+adminLocation+"\">back</a>",
 		p.Title, p.Title, p.Body)
 }
 
@@ -68,6 +94,8 @@ func saveHandler(w http.ResponseWriter, r *http.Request) {
 	body := r.FormValue("body")
 	p := &Page{Title: title, Body: []byte(body)}
 	p.save()
+	git(title) //this should probably only run if there have been changes
+	buildSite()	
 	http.Redirect(w, r, getConfig("AdminLocation"), http.StatusFound)
 }
 
