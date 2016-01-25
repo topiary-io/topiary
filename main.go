@@ -14,7 +14,7 @@ func buildSite() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("%s\nWebsite complied!\n---buildSite---\n\n", out)
+	fmt.Printf("%s\nWebsite compiled!\n---buildSite---\n\n", out)
 }
 
 func git(file string) {
