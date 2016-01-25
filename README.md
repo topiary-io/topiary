@@ -43,13 +43,13 @@ Right now the only way to install is by building from source.
   $ git clone https://github.com/topiary-io/topiary/admin
   ```
 
-5. Start Topiary:
+6. Start Topiary:
   ```
   $ cd path/to/hugo/site/root
   $ topiary
   ```
 
-6. Point a web browser to `localhost:3000` to view your site, and `localhost:3000/admin/` to view the site input.
+7. Point a web browser to `localhost:3000` to view your site, and `localhost:3000/admin/` to view the site input.
 
 ### Config
 
