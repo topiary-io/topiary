@@ -37,10 +37,9 @@ Right now the only way to install is by building from source.
   $ git clone https://github.com/enten/hugo-boilerplate
   ```
 
-5. Clone the admin assets in your Hugo directory:
+5. Copy the admin assets to your Hugo site root:
   ```
-  $ cd path/to/huge/site/root
-  $ git clone https://github.com/topiary-io/topiary/admin
+  $ cp -r $GOPATH/src/github.com/topiary-io/topiary/admin path/to/hugo/site/root
   ```
 
 6. Start Topiary:
