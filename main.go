@@ -87,7 +87,6 @@ func main() {
 	http.HandleFunc(adminLocation, adminHandler)
 	http.HandleFunc(adminLocation+"edit/", editHandler)
 	http.HandleFunc(adminLocation+"save/", saveHandler)
-	http.HandleFunc(adminLocation+"login-post/", postLogin)
 	http.HandleFunc(adminLocation+"login/", loginHandler)
 	http.HandleFunc(adminLocation+"logout/", logoutHandler)
 
