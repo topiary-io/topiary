@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"fmt"
 )
 
 type Page struct {
@@ -40,8 +41,49 @@ func loadDir(title string) (*Dir, error) {
 	return &Dir{Title: title, Body: body}, nil
 }
 
+func isAuth(w http.ResponseWriter, r *http.Request){
+	adminLocation := getConfig("AdminLocation")
+	title := r.URL.Path[len(adminLocation):]
+	if err := aaa.Authorize(w, r, true); err != nil && title != "login" && title != "login/" {
+		fmt.Println(err)
+		http.Redirect(w, r, adminLocation+"login/", http.StatusSeeOther)
+		return
+	}
+}
+
+func postLogin(w http.ResponseWriter, r *http.Request) {
+	adminLocation := getConfig("AdminLocation")
+	username := r.PostFormValue("username")
+	password := r.PostFormValue("password")
+	if err := aaa.Login(w, r, username, password, "/"); err != nil && err.Error() == "already authenticated" {
+		http.Redirect(w, r, adminLocation, http.StatusSeeOther)
+	} else if err != nil {
+		fmt.Println(err)
+		http.Redirect(w, r, adminLocation+"/login", http.StatusSeeOther)
+	}
+}
+
+func loginHandler(w http.ResponseWriter, r *http.Request) {
+	adminLocation := getConfig("AdminLocation")
+	title := r.URL.Path[len(adminLocation+"login/"):]
+	p := &Page{Title: title}
+	renderTemplatePage(w, "login.html", p)
+}
+
+func logoutHandler(w http.ResponseWriter, r *http.Request) {
+	if err := aaa.Logout(w, r); err != nil {
+		fmt.Println(err)
+		// this shouldn't happen
+		return
+	}
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
 func adminHandler(w http.ResponseWriter, r *http.Request) {
 	adminLocation := getConfig("AdminLocation")
+
+	isAuth(w,r)
+
 	title := r.URL.Path[len(adminLocation):]
 	if title == "" {
 		title = "./"
@@ -63,6 +105,9 @@ func adminHandler(w http.ResponseWriter, r *http.Request) {
 
 func editHandler(w http.ResponseWriter, r *http.Request) {
 	adminLocation := getConfig("AdminLocation")
+
+	isAuth(w,r)
+
 	title := r.URL.Path[len(adminLocation+"edit/"):]
 	p, err := loadPage(title)
 	if err != nil {
@@ -73,6 +118,9 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
 
 func saveHandler(w http.ResponseWriter, r *http.Request) {
 	adminLocation := getConfig("AdminLocation")
+
+	isAuth(w,r)
+
 	title := r.URL.Path[len(adminLocation+"save/"):]
 	body := r.FormValue("body")
 	p := &Page{Title: title, Body: []byte(body)}
