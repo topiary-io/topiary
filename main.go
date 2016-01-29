@@ -5,15 +5,9 @@ import (
 	"log"
 	"net/http"
 	"os/exec"
-	"github.com/apexskier/httpauth"
-	"golang.org/x/crypto/bcrypt"
 )
 
 var (
-	backend     httpauth.GobFileAuthBackend
-	aaa         httpauth.Authorizer
-	roles       map[string]httpauth.Role
-	authFile =  "admin/auth.gob"
 	adminLocation = getConfig("AdminLocation")
 )
 
@@ -47,38 +41,11 @@ func git(file string) {
 	fmt.Printf("git commit "+file+" %s\n------git------\n", outci)
 }
 
-func httpAuth(){
-	var err error
-
-	// authFile must exist in site home.
-	// could intruduce a way to dynamically create one or just default install it
-	backend, err = httpauth.NewGobFileAuthBackend(authFile)
-	if err != nil {
-		panic(err)
-	}
-
-	// create some default roles
-	roles = make(map[string]httpauth.Role)
-	roles["user"] = 30
-	roles["admin"] = 80
-	aaa, err = httpauth.NewAuthorizer(backend, []byte("cookie-encryption-key"), "user", roles)
-
-	// create a default user
-	hash, err := bcrypt.GenerateFromPassword([]byte("adminadmin"), bcrypt.DefaultCost)
-	if err != nil {
-		panic(err)
-	}
-	defaultUser := httpauth.UserData{Username: "admin", Email: "admin@localhost", Hash: hash, Role: "admin"}
-	err = backend.SaveUser(defaultUser)
-	if err != nil {
-		panic(err)
-	}
-}
 
 func main() {
 	initConfig()
 	buildSite()
-	httpAuth()
+	initAuth()
 
 	adminLocation := getConfig("AdminLocation")
 
