@@ -6,17 +6,17 @@ import (
 	"gopkg.in/fsnotify.v1"
 )
 
-func initConfig () {
+func initConfig() {
 	// defaults
 	viper.SetDefault("AdminLocation", "/admin/") // TODO : some helper to convert strings to paths ? ie: path("admin") -> "/admin/"
 
 	// config name and location
-	viper.SetConfigName("topiary")
+	viper.SetConfigName("config")
 
 	viper.AddConfigPath("/etc/topiary")
 	viper.AddConfigPath(".")
 
-	// read config 
+	// read config
 	err := viper.ReadInConfig()
 
 	if err != nil {
@@ -30,6 +30,6 @@ func initConfig () {
 	})
 }
 
-func getConfig (s string) string {
+func getConfig(s string) string {
 	return viper.GetString(s)
 }
