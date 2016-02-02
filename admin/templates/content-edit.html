@@ -1,0 +1,18 @@
+{{ template "header" }}
+
+    <main>
+      <form action="/admin/save/{{.Path}}" method="POST">
+        <h1>{{.Metadata.title}}</h1>
+        <ul>
+          {{range $key, $value := .Metadata}}
+            <li><label for="{{$key}}">{{$key}}</label> <input type="text" name="{{$key}}" value="{{$value}}" /></li>
+          {{end}}
+        </ul>
+
+        <div><textarea name="body" style="width:800px;height:400px;">{{.Body}}</textarea></div>
+        <div><input type="submit" value="Save"></div>
+      </form>
+    </main>
+
+{{ template "footer" }}
+
