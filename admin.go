@@ -117,8 +117,9 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
 	isAuth(w, r)
 
 	title := r.URL.Path[len(adminLocation+"edit/"):]
+	contentDir := getConfig("contentdir")
 
-	if strings.HasPrefix(title, "content") {
+	if strings.HasPrefix(title, contentDir) {
 		c, err := loadContent(title)
 		if err != nil {
 			c = &Content{Path: title}

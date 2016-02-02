@@ -9,6 +9,7 @@ import (
 func initConfig() {
 	// defaults
 	viper.SetDefault("AdminLocation", "/admin/") // TODO : some helper to convert strings to paths ? ie: path("admin") -> "/admin/"
+	viper.SetDefault("contentdir", "content")
 
 	// config name and location
 	viper.SetConfigName("config")
