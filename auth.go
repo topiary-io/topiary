@@ -2,19 +2,19 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 	"github.com/apexskier/httpauth"
 	"golang.org/x/crypto/bcrypt"
+	"net/http"
 )
 
 var (
-	backend     httpauth.GobFileAuthBackend
-	aaa         httpauth.Authorizer
-	roles       map[string]httpauth.Role
-	authFile =  "admin/auth.gob"
+	backend  httpauth.GobFileAuthBackend
+	aaa      httpauth.Authorizer
+	roles    map[string]httpauth.Role
+	authFile = "admin/auth.gob"
 )
 
-func initAuth(){
+func initAuth() {
 	var err error
 
 	// authFile must exist in site home.
@@ -41,8 +41,8 @@ func initAuth(){
 		panic(err)
 	}
 }
- 
-func isAuth(w http.ResponseWriter, r *http.Request){
+
+func isAuth(w http.ResponseWriter, r *http.Request) {
 	adminLocation := getConfig("AdminLocation")
 	title := r.URL.Path[len(adminLocation):]
 	if err := aaa.Authorize(w, r, true); err != nil && title != "login/" {
@@ -66,8 +66,8 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		adminLocation := getConfig("AdminLocation")
 		title := r.URL.Path[len(adminLocation+"login/"):]
-		p := &Page{Title: title}
-		renderTemplatePage(w, "login.html", p)
+		p := &Content{Path: title}
+		renderTemplateContent(w, "login.html", p)
 	}
 }
 
@@ -80,4 +80,3 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	http.Redirect(w, r, adminLocation+"/login/", http.StatusSeeOther)
 }
-

@@ -5,7 +5,7 @@
         <h1>{{.Metadata.title}}</h1>
         <ul>
           {{range $key, $value := .Metadata}}
-            <li><label for="{{$key}}">{{$key}}</label> <input type="text" name="{{$key}}" value="{{$value}}" /></li>
+          <li><label for="{{$key}}">{{$key}}</label> <input type="text" name="fm.{{$key}}" value="{{$value}}" /></li>
           {{end}}
         </ul>
 

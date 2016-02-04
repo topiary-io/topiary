@@ -41,7 +41,6 @@ func git(file string) {
 	fmt.Printf("git commit "+file+" %s\n------git------\n", outci)
 }
 
-
 func main() {
 	initConfig()
 	buildSite()
