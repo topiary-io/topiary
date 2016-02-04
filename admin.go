@@ -41,41 +41,63 @@ func adminHandler(w http.ResponseWriter, r *http.Request) {
 
 func editHandler(w http.ResponseWriter, r *http.Request) {
 	adminLocation := getConfig("AdminLocation")
+	contentDir := getConfig("contentdir")
 
 	isAuth(w, r)
 
-	title := r.URL.Path[len(adminLocation+"edit/"):]
+	path := r.URL.Path[len(adminLocation+"edit/"):]
 
-	c, err := new(Page).Read(title)
+	if strings.HasPrefix(path, contentDir) {
 
-	if err != nil {
-		c = &Content{Path: title}
+		c, err := new(Page).contentRead(path)
+
+		if err != nil {
+			c = &Content{Path: path}
+		}
+
+		renderTemplateContent(w, "content-edit.html", c)
+	} else {
+		p, err := new(Page).Read(path)
+
+		if err != nil {
+			p = &Page{Path: path}
+		}
+
+		renderTemplatePage(w, "edit.html", p)
 	}
-
-	renderTemplateContent(w, "content-edit.html", c)
 }
 
 func saveHandler(w http.ResponseWriter, r *http.Request) {
 	adminLocation := getConfig("AdminLocation")
+	contentDir := getConfig("contentdir")
 
 	isAuth(w, r)
 
 	path := r.URL.Path[len(adminLocation+"save/"):]
-	var page Page
 
-	r.ParseForm()
+	if strings.HasPrefix(path, contentDir) {
+		var page Page
 
-	fm := make(map[string]interface{})
+		r.ParseForm()
 
-	for key, values := range r.Form {
-		for _, value := range values {
-			if strings.HasPrefix(key, "fm.") {
-				fm[key[3:]] = value
+		fm := make(map[string]interface{})
+
+		for key, values := range r.Form {
+			for _, value := range values {
+				if strings.HasPrefix(key, "fm.") {
+					fm[key[3:]] = value
+				}
 			}
 		}
-	}
 
-	page.Update(path, fm, []byte(r.FormValue("body")))
+		page.contentUpdate(path, fm, []byte(r.FormValue("body")))
+	} else {
+		page := &Page{
+			Path: path,
+			Body: r.FormValue("body"),
+		}
+		page.Update(path, []byte(r.FormValue("body")))
+	}
 
 	git(path) //this should probably only run if there have been changes
 	buildSite()
@@ -83,6 +105,13 @@ func saveHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 var templates = template.Must(template.ParseGlob("admin/templates/*"))
+
+func renderTemplatePage(w http.ResponseWriter, tmpl string, p *Page) {
+	err := templates.ExecuteTemplate(w, tmpl, p)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
 
 func renderTemplateContent(w http.ResponseWriter, tmpl string, c *Content) {
 	err := templates.ExecuteTemplate(w, tmpl, c)

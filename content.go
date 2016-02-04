@@ -17,14 +17,17 @@ type (
 		Body     string
 	}
 
-	Page struct{}
+	Page struct {
+		Path string
+		Body string
+	}
 )
 
 func NewPage() *Page {
 	return &Page{}
 }
 
-func (c *Content) Save() error {
+func (c *Content) contentSave() error {
 	page, err := hugolib.NewPage(c.Path)
 
 	if err != nil {
@@ -44,7 +47,7 @@ type PageManager interface {
 	Delete(fp string) error
 }
 
-func (p Page) Read(filename string) (*Content, error) {
+func (p Page) contentRead(filename string) (*Content, error) {
 	file, err := os.Open(filename)
 	if err != nil {
 		return nil, err
@@ -73,7 +76,7 @@ func (p Page) Read(filename string) (*Content, error) {
 	}, nil
 }
 
-func (p Page) Create(fp string, fm Frontmatter, content []byte) (*Content, error) {
+func (p Page) contentCreate(fp string, fm Frontmatter, content []byte) (*Content, error) {
 
 	// create a new page
 	page := &Content{
@@ -83,7 +86,7 @@ func (p Page) Create(fp string, fm Frontmatter, content []byte) (*Content, error
 	}
 
 	// save page to disk
-	err := page.Save()
+	err := page.contentSave()
 	if err != nil {
 		return nil, err
 	}
@@ -92,10 +95,10 @@ func (p Page) Create(fp string, fm Frontmatter, content []byte) (*Content, error
 }
 
 // UpdatePage changes the content of an existing page
-func (p Page) Update(fp string, fm Frontmatter, content []byte) (*Content, error) {
+func (p Page) contentUpdate(fp string, fm Frontmatter, content []byte) (*Content, error) {
 
 	// delete existing page
-	err := p.Delete(fp)
+	err := p.contentDelete(fp)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +111,7 @@ func (p Page) Update(fp string, fm Frontmatter, content []byte) (*Content, error
 	}
 
 	// save page to disk
-	err = page.Save()
+	err = page.contentSave()
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +119,7 @@ func (p Page) Update(fp string, fm Frontmatter, content []byte) (*Content, error
 	return page, nil
 }
 
-func (p Page) Delete(fp string) error {
+func (p Page) contentDelete(fp string) error {
 
 	// check that file exists
 	info, err := os.Stat(fp)
