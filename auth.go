@@ -5,6 +5,7 @@ import (
 	"github.com/apexskier/httpauth"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
+	"html/template"
 )
 
 var (
@@ -53,8 +54,8 @@ func isAuth(w http.ResponseWriter, r *http.Request) {
 }
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
+	adminLocation := getConfig("AdminLocation")
 	if r.Method == "POST" {
-		adminLocation := getConfig("AdminLocation")
 		username := r.PostFormValue("username")
 		password := r.PostFormValue("password")
 		if err := aaa.Login(w, r, username, password, "/"); err != nil && err.Error() == "already authenticated" {
@@ -64,10 +65,43 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, adminLocation+"/login/", http.StatusSeeOther)
 		}
 	} else {
-		adminLocation := getConfig("AdminLocation")
 		title := r.URL.Path[len(adminLocation+"login/"):]
 		p := &Content{Path: title}
 		renderTemplateContent(w, "login.html", p)
+	}
+}
+
+func adminUsersHandler(w http.ResponseWriter, r *http.Request) {
+	isAuth(w,r)
+	if r.Method == "POST" {
+		var user httpauth.UserData
+		user.Username = r.PostFormValue("username")
+		user.Email = r.PostFormValue("email")
+		password := r.PostFormValue("password")
+		user.Role = r.PostFormValue("role")
+		if err := aaa.Register(w, r, user, password); err != nil {
+		// maybe something
+		}
+	}
+
+	if user, err := aaa.CurrentUser(w,r); err == nil {
+		type data struct {
+			User  httpauth.UserData
+			Roles map[string]httpauth.Role
+			Users []httpauth.UserData
+			Msg   []string
+		}
+		messages := aaa.Messages(w, r)
+		users, err := backend.Users()
+		if err != nil {
+			panic(err)
+		}
+		d := data{User: user, Roles: roles, Users: users, Msg: messages}
+		var templates = template.Must(template.ParseGlob("admin/templates/*"))
+		t_err := templates.ExecuteTemplate(w, "manage-accounts.html", d)
+		if t_err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	}
 }
 

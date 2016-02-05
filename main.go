@@ -55,6 +55,7 @@ func main() {
 	http.HandleFunc(adminLocation+"save/", saveHandler)
 	http.HandleFunc(adminLocation+"login/", loginHandler)
 	http.HandleFunc(adminLocation+"logout/", logoutHandler)
+	http.HandleFunc(adminLocation+"manage-accounts/", adminUsersHandler)
 
 	fmt.Println("Starting server on port 3000...")
 	fmt.Println("Admin available at:", adminLocation)
