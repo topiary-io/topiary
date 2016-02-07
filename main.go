@@ -50,6 +50,7 @@ func main() {
 
 	http.Handle("/", http.FileServer(http.Dir("./public"))) // serve site output (`/public`) into `/`
 	http.Handle(adminLocation+"assets/", http.StripPrefix(adminLocation+"assets/", http.FileServer(http.Dir("./admin/assets"))))
+	serveMithrilAdmin()
 	http.HandleFunc(adminLocation, adminHandler)
 	http.HandleFunc(adminLocation+"edit/", editHandler)
 	http.HandleFunc(adminLocation+"save/", saveHandler)
