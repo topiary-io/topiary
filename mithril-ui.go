@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"io/ioutil"
 	"net/http"
+	"path"
 )
 
 // TODO - should gzip files
@@ -116,14 +117,36 @@ func writeDocument(w http.ResponseWriter, r *http.Request) {
 func serveMithrilAdmin() {
 	adminLocation := mithrilAdminLocation()
 
-	tmpl := template.Must(template.ParseGlob("admin/templates/mithril-ui*"))
+	tmplBytes, err := Asset("admin/ui/data/index.html")
+	if err != nil {
+		fmt.Println("Template error:", err)
+	}
+
+	tmpl := template.Must(template.New("index").Parse(string(tmplBytes)))
 	cfg := Config{adminLocation}
 
-	fs := http.FileServer(http.Dir("." + getConfig("AdminLocation") + "ui"))
-	http.Handle(adminLocation+"ui/", http.StripPrefix(adminLocation+"ui", fs))
+	//	fs := http.FileServer(http.Dir("." + getConfig("AdminLocation") + "ui"))
+	//	http.Handle(adminLocation+"ui/", http.StripPrefix(adminLocation+"ui", fs))
+
+	http.HandleFunc(path.Join(adminLocation, "ui/bundle.js"), func(w http.ResponseWriter, r *http.Request) {
+		data, err := Asset("admin/ui/data/bundle.js")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		w.Write(data)
+	})
+
+	http.HandleFunc(path.Join(adminLocation, "ui/main.css"), func(w http.ResponseWriter, r *http.Request) {
+		data, err := Asset("admin/ui/data/main.css")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		w.Header().Set("Content-Type", "text/css")
+		w.Write(data)
+	})
 
 	http.HandleFunc(adminLocation, func(w http.ResponseWriter, r *http.Request) {
-		err := tmpl.ExecuteTemplate(w, "mithril-ui.html", cfg)
+		err := tmpl.Execute(w, cfg)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}

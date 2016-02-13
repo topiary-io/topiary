@@ -93,6 +93,10 @@ body {
   background-color: #fff;
 }
 header {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
   height: 5rem;
   background-color: #f0f0f0;
   border-bottom: 0.1rem solid #e5e5e5;
@@ -153,7 +157,7 @@ nav ul span {
   padding-left: 25rem;
 }
 main {
-  padding: 0 1.5rem;
+  padding: 5rem 1.5rem 0;
   margin-bottom: 3rem;
 }
 footer {
