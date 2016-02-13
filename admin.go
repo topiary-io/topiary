@@ -25,7 +25,7 @@ func loadDir(title string) (*Dir, error) {
 func adminHandler(w http.ResponseWriter, r *http.Request) {
 	adminLocation := getConfig("AdminLocation")
 
-	isAuth(w, r)
+	isAuth(w,r,"user")
 
 	title := r.URL.Path[len(adminLocation):]
 	if title == "" {
@@ -43,7 +43,7 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
 	adminLocation := getConfig("AdminLocation")
 	contentDir := getConfig("contentdir")
 
-	isAuth(w, r)
+	isAuth(w,r,"user")
 
 	path := r.URL.Path[len(adminLocation+"edit/"):]
 
@@ -71,7 +71,7 @@ func saveHandler(w http.ResponseWriter, r *http.Request) {
 	adminLocation := getConfig("AdminLocation")
 	contentDir := getConfig("contentdir")
 
-	isAuth(w, r)
+	isAuth(w,r,"user")
 
 	path := r.URL.Path[len(adminLocation+"save/"):]
 

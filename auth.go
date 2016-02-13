@@ -43,12 +43,18 @@ func initAuth() {
 	}
 }
 
-func isAuth(w http.ResponseWriter, r *http.Request) {
+func isAuth(w http.ResponseWriter, r *http.Request, role string) {
+	// first check if you are logged in to the admin if not then redirect to login page
 	adminLocation := getConfig("AdminLocation")
 	title := r.URL.Path[len(adminLocation):]
 	if err := aaa.Authorize(w, r, true); err != nil && title != "login/" {
 		fmt.Println(err)
 		http.Redirect(w, r, adminLocation+"login/", http.StatusSeeOther)
+		return
+	}
+	// next check if you have the required role
+	if err_role := aaa.AuthorizeRole(w,r,role,false); err_role != nil {
+		fmt.Println(err_role)
 		return
 	}
 }
@@ -72,7 +78,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func adminUsersHandler(w http.ResponseWriter, r *http.Request) {
-	isAuth(w,r)
+	isAuth(w,r,"admin")
 	if r.Method == "POST" {
 		var user httpauth.UserData
 		user.Username = r.PostFormValue("username")
