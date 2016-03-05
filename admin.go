@@ -1,6 +1,7 @@
 package main
 
 import (
+	//	"fmt"
 	"html/template"
 	"io/ioutil"
 	"net/http"
@@ -13,6 +14,7 @@ type Dir struct {
 	Body  []os.FileInfo
 }
 
+// TODO need a way to lock this to current hugo-site dir
 func loadDir(title string) (*Dir, error) {
 	dir := title
 	body, err := ioutil.ReadDir(dir)
@@ -22,15 +24,55 @@ func loadDir(title string) (*Dir, error) {
 	return &Dir{Title: title, Body: body}, nil
 }
 
-func adminHandler(w http.ResponseWriter, r *http.Request) {
-	adminLocation := getConfig("AdminLocation")
+// Might need a better name ; is a location pair where
+//	Root = site root (ie /admin/)
+//	Dir  = relative file path (ie ./admin)
+type Location struct {
+	Root string
+	Dir  string
+}
 
-	isAuth(w,r,"user")
+func serveAdmin(root string, dir string) {
+	// TODO some way to standardize roots / dirs (path is wonky)
+	// TODO templates should read adminroot (instead of hardcoding /admin/...)
+	admin := Location{root, dir}
 
-	title := r.URL.Path[len(adminLocation):]
+	// serve admin
+	http.HandleFunc(admin.Root, func(w http.ResponseWriter, r *http.Request) {
+		adminHandler(w, r, admin)
+	})
+
+	// serve assets
+	assetroot := admin.Root + "assets/"
+	assetdir := admin.Dir + "/assets"
+	http.Handle(assetroot, http.StripPrefix(assetroot, http.FileServer(http.Dir(assetdir))))
+
+	// API
+	http.HandleFunc(admin.Root+"edit/", func(w http.ResponseWriter, r *http.Request) {
+		editHandler(w, r, admin)
+	})
+	http.HandleFunc(admin.Root+"save/", func(w http.ResponseWriter, r *http.Request) {
+		saveHandler(w, r, admin)
+	})
+	http.HandleFunc(admin.Root+"login/", func(w http.ResponseWriter, r *http.Request) {
+		loginHandler(w, r, admin)
+	})
+	http.HandleFunc(admin.Root+"logout/", func(w http.ResponseWriter, r *http.Request) {
+		logoutHandler(w, r, admin)
+	})
+	http.HandleFunc(admin.Root+"manage-accounts/", func(w http.ResponseWriter, r *http.Request) {
+		adminUsersHandler(w, r, admin)
+	})
+}
+
+func adminHandler(w http.ResponseWriter, r *http.Request, admin Location) {
+	isAuth(w, r, admin, "user")
+
+	title := r.URL.Path[len(admin.Root):]
 	if title == "" {
 		title = "./"
 	}
+
 	p, err := loadDir(title)
 	if err != nil {
 		p = &Dir{Title: title}
@@ -39,13 +81,13 @@ func adminHandler(w http.ResponseWriter, r *http.Request) {
 	renderTemplateDir(w, "view.html", p)
 }
 
-func editHandler(w http.ResponseWriter, r *http.Request) {
-	adminLocation := getConfig("AdminLocation")
+func editHandler(w http.ResponseWriter, r *http.Request, admin Location) {
+	// TODO : pass in
 	contentDir := getConfig("contentdir")
 
-	isAuth(w,r,"user")
+	isAuth(w, r, admin, "user")
 
-	path := r.URL.Path[len(adminLocation+"edit/"):]
+	path := r.URL.Path[len(admin.Root+"edit/"):]
 
 	if strings.HasPrefix(path, contentDir) {
 
@@ -67,13 +109,12 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func saveHandler(w http.ResponseWriter, r *http.Request) {
-	adminLocation := getConfig("AdminLocation")
+func saveHandler(w http.ResponseWriter, r *http.Request, admin Location) {
 	contentDir := getConfig("contentdir")
 
-	isAuth(w,r,"user")
+	isAuth(w, r, admin, "user")
 
-	path := r.URL.Path[len(adminLocation+"save/"):]
+	path := r.URL.Path[len(admin.Root+"save/"):]
 
 	if strings.HasPrefix(path, contentDir) {
 		var page Page
@@ -101,7 +142,7 @@ func saveHandler(w http.ResponseWriter, r *http.Request) {
 
 	git(path) //this should probably only run if there have been changes
 	buildSite()
-	http.Redirect(w, r, adminLocation, http.StatusFound)
+	http.Redirect(w, r, admin.Root, http.StatusFound)
 }
 
 var templates = template.Must(template.ParseGlob("admin/templates/*"))

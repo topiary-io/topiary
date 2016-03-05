@@ -52,15 +52,12 @@ Right now the only way to install is by building from source.
 
 ### Config
 
-Topiary will read a config file in either `/etc/topiary` or the location it is ran from.
-Supported types include json, yaml, and toml.
+Topiary will read a config file in either `/etc/topiary` or to your site's Hugo config file.
 
-For example, to change the admin url you could have in _topiary.json_:
-
-```
-{
-  "AdminLocation" : "/my-custom-admin-directory/"
-}
+```toml
+[topiary]
+  admindir  = "admin" # location of admin assets
+  adminroot = "/admin" # front end admin root
 ```
 
 ### License

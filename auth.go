@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/apexskier/httpauth"
 	"golang.org/x/crypto/bcrypt"
-	"net/http"
 	"html/template"
+	"net/http"
 )
 
 var (
@@ -43,42 +43,40 @@ func initAuth() {
 	}
 }
 
-func isAuth(w http.ResponseWriter, r *http.Request, role string) {
+func isAuth(w http.ResponseWriter, r *http.Request, admin Location, role string) {
 	// first check if you are logged in to the admin if not then redirect to login page
-	adminLocation := getConfig("AdminLocation")
-	title := r.URL.Path[len(adminLocation):]
+	title := r.URL.Path[len(admin.Root):]
 	if err := aaa.Authorize(w, r, true); err != nil && title != "login/" {
 		fmt.Println(err)
-		http.Redirect(w, r, adminLocation+"login/", http.StatusSeeOther)
+		http.Redirect(w, r, admin.Root+"login/", http.StatusSeeOther)
 		return
 	}
 	// next check if you have the required role
-	if err_role := aaa.AuthorizeRole(w,r,role,false); err_role != nil {
+	if err_role := aaa.AuthorizeRole(w, r, role, false); err_role != nil {
 		fmt.Println(err_role)
 		return
 	}
 }
 
-func loginHandler(w http.ResponseWriter, r *http.Request) {
-	adminLocation := getConfig("AdminLocation")
+func loginHandler(w http.ResponseWriter, r *http.Request, admin Location) {
 	if r.Method == "POST" {
 		username := r.PostFormValue("username")
 		password := r.PostFormValue("password")
 		if err := aaa.Login(w, r, username, password, "/"); err != nil && err.Error() == "already authenticated" {
-			http.Redirect(w, r, adminLocation, http.StatusSeeOther)
+			http.Redirect(w, r, admin.Root, http.StatusSeeOther)
 		} else if err != nil {
 			fmt.Println(err)
-			http.Redirect(w, r, adminLocation+"/login/", http.StatusSeeOther)
+			http.Redirect(w, r, admin.Root+"/login/", http.StatusSeeOther)
 		}
 	} else {
-		title := r.URL.Path[len(adminLocation+"login/"):]
+		title := r.URL.Path[len(admin.Root+"login/"):]
 		p := &Content{Path: title}
 		renderTemplateContent(w, "login.html", p)
 	}
 }
 
-func adminUsersHandler(w http.ResponseWriter, r *http.Request) {
-	isAuth(w,r,"admin")
+func adminUsersHandler(w http.ResponseWriter, r *http.Request, admin Location) {
+	isAuth(w, r, admin, "admin")
 	if r.Method == "POST" {
 		var user httpauth.UserData
 		user.Username = r.PostFormValue("username")
@@ -86,11 +84,11 @@ func adminUsersHandler(w http.ResponseWriter, r *http.Request) {
 		password := r.PostFormValue("password")
 		user.Role = r.PostFormValue("role")
 		if err := aaa.Register(w, r, user, password); err != nil {
-		// maybe something
+			// maybe something
 		}
 	}
 
-	if user, err := aaa.CurrentUser(w,r); err == nil {
+	if user, err := aaa.CurrentUser(w, r); err == nil {
 		type data struct {
 			User  httpauth.UserData
 			Roles map[string]httpauth.Role
@@ -111,12 +109,11 @@ func adminUsersHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func logoutHandler(w http.ResponseWriter, r *http.Request) {
-	adminLocation := getConfig("AdminLocation")
+func logoutHandler(w http.ResponseWriter, r *http.Request, admin Location) {
 	if err := aaa.Logout(w, r); err != nil {
 		fmt.Println(err)
 		// this shouldn't happen
 		return
 	}
-	http.Redirect(w, r, adminLocation+"/login/", http.StatusSeeOther)
+	http.Redirect(w, r, admin.Root+"/login/", http.StatusSeeOther)
 }

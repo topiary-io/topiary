@@ -7,10 +7,6 @@ import (
 	"os/exec"
 )
 
-var (
-	adminLocation = getConfig("AdminLocation")
-)
-
 func buildSite() {
 	fmt.Println("\n---buildSite---\nCompiling website...")
 
@@ -46,19 +42,17 @@ func main() {
 	buildSite()
 	initAuth()
 
-	adminLocation := getConfig("AdminLocation")
+	// serve site output (`/public`) into `/`
+	http.Handle("/", http.FileServer(http.Dir("./public")))
 
-	http.Handle("/", http.FileServer(http.Dir("./public"))) // serve site output (`/public`) into `/`
-	http.Handle(adminLocation+"assets/", http.StripPrefix(adminLocation+"assets/", http.FileServer(http.Dir("./admin/assets"))))
-	http.HandleFunc(adminLocation, adminHandler)
-	http.HandleFunc(adminLocation+"edit/", editHandler)
-	http.HandleFunc(adminLocation+"save/", saveHandler)
-	http.HandleFunc(adminLocation+"login/", loginHandler)
-	http.HandleFunc(adminLocation+"logout/", logoutHandler)
-	http.HandleFunc(adminLocation+"manage-accounts/", adminUsersHandler)
+	// serve the topiary admin
+	adminroot := getConfig("adminroot")
+	admindir := getConfig("admindir")
+	serveAdmin(adminroot, admindir)
 
+	// start the server
 	fmt.Println("Starting server on port 3000...")
-	fmt.Println("Admin available at:", adminLocation)
+	fmt.Println("Admin available at:", adminroot)
 	err := http.ListenAndServe(":3000", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
